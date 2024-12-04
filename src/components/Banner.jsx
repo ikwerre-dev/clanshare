@@ -73,7 +73,7 @@ export default function HeroSection() {
 
     const handleCopyLink = (e) => {
         e.preventDefault();
-        // navigator.clipboard.writeText(shareLink); // Uncomment this to copy the link
+        navigator.clipboard.writeText(shareLink); // Uncomment this to copy the link
         setCopiedLink(true);
         setTimeout(() => setCopiedLink(false), 2000);
     };
