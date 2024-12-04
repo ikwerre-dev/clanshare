@@ -3,7 +3,7 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Link2, Upload, Check, Copy, Zap, Shield, Globe, Users, Download } from 'lucide-react'
+import { Link2, Upload, Check, Copy, Zap, Shield, Globe, Users, Download, Redo } from 'lucide-react'
 import Lenis from '@studio-freight/lenis'
 import { MessageSquare, Lock, Settings } from 'lucide-react'
 import { Link } from 'react-router-dom'
@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom'
 export default function HeroSection() {
     const [uploadProgress, setUploadProgress] = useState(0)
     const [isUploading, setIsUploading] = useState(false)
+    const [isClickable, setIsClickable] = useState(true)
     const [shareLink, setShareLink] = useState(null)
     const [copiedLink, setCopiedLink] = useState(false)
     const dropzoneRef = useRef(null)
@@ -55,6 +56,7 @@ export default function HeroSection() {
                     clearInterval(interval)
                     setTimeout(() => {
                         setIsUploading(false)
+                        setIsClickable(false)
                         setUploadProgress(0)
                         setShareLink('https://share.example.com/' + Math.random().toString(36).substring(7))
                     }, 500)
@@ -75,6 +77,14 @@ export default function HeroSection() {
         setCopiedLink(true);
         setTimeout(() => setCopiedLink(false), 2000);
     };
+
+    const handleRestart = (e) => {
+
+        setIsClickable(true)
+        setIsUploading(false)
+        setShareLink(null)
+    };
+
 
     return (
         <div className="relative min-h-screen bg-gradient-to-b from-black via-purple-900/30 to-black">
@@ -100,9 +110,9 @@ export default function HeroSection() {
                     <div
                         {...getRootProps()}
                         ref={dropzoneRef}
-                        className="relative max-w-4xl w-full h-[25rem] rounded-lg border-2 border-dashed border-gray-400 transition-colors hover:border-purple-400 overflow-hidden"
+                        className="relative cursor-pointer max-w-4xl w-full h-[25rem] rounded-lg border-2 border-dashed border-gray-400 transition-colors hover:border-purple-400 overflow-hidden"
                     >
-                        <input {...getInputProps()} />
+                        {isClickable && <input {...getInputProps()} />}
 
                         {/* Background Circles */}
                         <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
@@ -167,8 +177,8 @@ export default function HeroSection() {
                                     <p className="text-purple-400">{uploadProgress}%</p>
                                 </div>
                             ) : shareLink ? (
-                                <div className="flex flex-col items-center space-y-4  z-50" 
-                                onClick={handleCopyLink}
+                                <div className="flex flex-col items-center space-y-4  z-50"
+                                    onClick={handleCopyLink}
                                 >
                                     <div className="flex items-center space-x-2  z-50 bg-purple-500/20 px-4 py-2 rounded-2xl backdrop-blur-sm">
                                         <Link2 className="w-5 h-5 text-purple-400" />
@@ -180,6 +190,14 @@ export default function HeroSection() {
                                     >
                                         {copiedLink ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                                         <span>{copiedLink ? 'Copied!' : 'Click to copy link'}</span>
+                                    </button>
+
+                                    <button
+                                        onClick={handleRestart}
+                                        className="flex items-center  z-50 space-x-2 text-sm text-gray-400 hover:text-purple-400"
+                                    >
+                                        <Redo className="w-4 h-4" />
+                                        <span>Restart</span>
                                     </button>
                                 </div>
                             ) : (
@@ -331,7 +349,7 @@ export default function HeroSection() {
                                 >
                                     <p className="text-gray-300 mb-4">Been able to Build a secure sharing tunnel for you to share files and Apps within yourself, This Project is open source, Feel Free to Star, Fork this repo... Happy Coding :)</p>
                                     <div className="flex items-center gap-3">
-                                         <div>
+                                        <div>
                                             <p className="font-semibold">Robinson Honour</p>
                                             <p className="text-gray-400 text-sm">FullStack Developer</p>
                                         </div>
