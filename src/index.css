@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*{
+  font-family: 'Roboto Slab Variable', serif;
+}
+
+body{
+  background-color: #D8D5DB;
+}
+::selection {
+  background: #621a7c40;
+}
