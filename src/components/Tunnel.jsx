@@ -10,13 +10,10 @@ const FileTunnel = () => {
     const [joinCode, setJoinCode] = useState('')
     const [isJoined, setIsJoined] = useState(false)
     const [uploadedFiles, setUploadedFiles] = useState([
-        { name: 'document.pdf' },
-        { name: 'image.jpg' },
-        { name: 'spreadsheet.xlsx' }
+      
     ])
     const [receivedFiles, setReceivedFiles] = useState([
-        { name: 'received_file.docx' },
-        { name: 'presentation.pptx' }
+     
     ])
     const [isUploading, setIsUploading] = useState(false)
     const [uploadProgress, setUploadProgress] = useState(0)
