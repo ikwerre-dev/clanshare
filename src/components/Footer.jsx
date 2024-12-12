@@ -11,10 +11,10 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="mt-8 pt-8 border-t border-gray-700">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p>&copy; {currentYear} Clan Share. All rights reserved.</p>
+            <p>&copy; {currentYear} Clan Share. - By Robinson Honour</p>
             <div className="flex space-x-4 mt-4 md:mt-0">
-              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+              <a href="https://github.com/ikwerre-dev" className="hover:text-white transition-colors">Github</a>
+              <a href="https://robinsonhonour.me" className="hover:text-white transition-colors">PortFolio</a>
             </div>
           </div>
         </div>
