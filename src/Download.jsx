@@ -10,8 +10,7 @@ import fileDownload from "js-file-download";
 const FileTunnel = () => {
   const { access } = useParams(); // Extracting the :access parameter
   const [fileData, setFileData] = useState(null);
-  const apiUrl = "http://192.168.1.115/clanshare_api";
-
+  const apiUrl = import.meta.env.VITE_API_URL;
   useEffect(() => {
     const fetchFileData = async () => {
       try {

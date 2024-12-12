@@ -20,10 +20,10 @@ import Lenis from "@studio-freight/lenis";
 import { MessageSquare, Lock, Settings } from "lucide-react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
 export default function HeroSection() {
-  const apiUrl = "http://192.168.1.115/clanshare_api";
+  const apiUrl = import.meta.env.VITE_API_URL;
   const currentURL = window.location.href.replace(/\/$/, "");
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
