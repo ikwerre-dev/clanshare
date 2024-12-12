@@ -4,51 +4,45 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Link2, Upload, Check, Copy, X, Download } from 'lucide-react'
 import Lenis from '@studio-freight/lenis'
 
+
 const FileTunnel = () => {
-    const [tunnelMode, setTunnelMode] = useState(null) // 'create' or 'join'
+    const [tunnelMode, setTunnelMode] = useState(null)
     const [tunnelCode, setTunnelCode] = useState('')
     const [joinCode, setJoinCode] = useState('')
     const [isJoined, setIsJoined] = useState(false)
-    const [uploadedFiles, setUploadedFiles] = useState([
-      
-    ])
-    const [receivedFiles, setReceivedFiles] = useState([
-     
-    ])
+    const [uploadedFiles, setUploadedFiles] = useState([])
+    const [receivedFiles, setReceivedFiles] = useState([])
     const [isUploading, setIsUploading] = useState(false)
     const [uploadProgress, setUploadProgress] = useState(0)
     const [copiedCode, setCopiedCode] = useState(false)
+    const [connectedUsers, setConnectedUsers] = useState(0)
     const dropzoneRef = useRef(null)
-
-    useEffect(() => {
-        const lenis = new Lenis()
-
-        function raf(time) {
-            lenis.raf(time)
-            requestAnimationFrame(raf)
-        }
-
-        requestAnimationFrame(raf)
-    }, [])
-
+    console.log(receivedFiles)
+    // console.log(uploadedFiles)
+    console.log(receivedFiles && receivedFiles.flat().map((file, index) => file.name));
+    
     const generateTunnelCode = () => {
         return Math.floor(100000 + Math.random() * 900000).toString()
     }
 
     const handleCreateTunnel = () => {
+        const newCode = generateTunnelCode()
         setTunnelMode('create')
-        setTunnelCode(generateTunnelCode())
+        setTunnelCode(newCode)
+        socket.emit('generateCode', newCode)
+        setIsJoined(true)
     }
 
     const handleJoinTunnel = () => {
         if (joinCode.length === 6) {
             setTunnelMode('join')
             setIsJoined(true)
-            // In a real application, you would verify the code here
+            socket.emit('joinCode', joinCode)
         }
     }
 
     const handleCloseTunnel = () => {
+        socket.emit('leaveRoom')
         setTunnelMode(null)
         setTunnelCode('')
         setJoinCode('')
@@ -58,27 +52,35 @@ const FileTunnel = () => {
     }
 
     const onDrop = useCallback((acceptedFiles) => {
-        setIsUploading(true)
-        let progress = 0
-        const interval = setInterval(() => {
-            progress += 10
-            setUploadProgress(progress)
-            if (progress >= 100) {
-                clearInterval(interval)
-                setTimeout(() => {
-                    setIsUploading(false)
-                    setUploadProgress(0)
-                    setUploadedFiles(prev => [...prev, ...acceptedFiles])
-                    // In a real application, you would send the file to the other end of the tunnel here
-                    setReceivedFiles(prev => [...prev, ...acceptedFiles]) // Simulating received files
-                }, 500)
-            }
-        }, 100)
-    }, [])
+        if (connectedUsers > 1) {
+            setIsUploading(true)
+            let progress = 0
+            const interval = setInterval(() => {
+                progress += 10
+                setUploadProgress(progress)
+                if (progress >= 100) {
+                    clearInterval(interval)
+                    setTimeout(() => {
+                        setIsUploading(false)
+                        setUploadProgress(0)
+                        const newFiles = acceptedFiles.map(file => ({
+                            name: file.name,
+                            url: URL.createObjectURL(file)
+                        }))
+                        setUploadedFiles(prev => [...prev, ...newFiles])
+                        socket.emit('sendFile', newFiles)
+                    }, 500)
+                }
+            }, 100)
+        } else {
+            alert("Please wait for at least one other user to join before uploading files.")
+        }
+    }, [connectedUsers])
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
-        multiple: true
+        multiple: true,
+        disabled: connectedUsers <= 1
     })
 
     const handleCopyCode = () => {
@@ -86,21 +88,52 @@ const FileTunnel = () => {
         setCopiedCode(true)
         setTimeout(() => setCopiedCode(false), 2000)
     }
-
+    // const renderFileList = (files) => (
+    //     <ul className="mt-4 space-y-2">
+    //         {files.flat().map((file, index) => (
+    //             <li key={index} className="text-gray-300 py-2 flex justify-between items-center">
+    //                 <p className="text-gray-300 underline underline-offset-4 cursor-pointer">{file.name}</p>
+    //                 <a href={file.url} download={file.name} className="text-purple-400 hover:text-purple-300">
+    //                     <Download className="w-5 h-5" />
+    //                 </a>
+    //             </li>
+    //         ))}
+    //     </ul>
+    // );
     const renderFileList = (files) => (
         <ul className="mt-4 space-y-2">
-            {files.map((file, index) => (
-                <li key={index} className="text-gray-300 py-2  flex justify-between cursor-pointer ">
-                    <p className="text-gray-300 underline  underline-offset-4 cursor-pointer "> {file.name}</p>
-                    <Download />
+            {files.flat().map((file, index) => (
+                <li key={index} className="text-gray-300 py-2 flex justify-between items-center">
+                    <p className="text-gray-300 underline underline-offset-4 cursor-pointer">{file.name}</p>
+                    <a
+                        href={file.url}
+                        download={file.name}
+                        className="text-purple-400 hover:text-purple-300"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            fetch(file.url)
+                                .then(response => response.blob())
+                                .then(blob => {
+                                    const url = window.URL.createObjectURL(blob);
+                                    const a = document.createElement('a');
+                                    a.style.display = 'none';
+                                    a.href = url;
+                                    a.download = file.name;
+                                    document.body.appendChild(a);
+                                    a.click();
+                                    window.URL.revokeObjectURL(url);
+                                });
+                        }}
+                    >
+                        <Download className="w-5 h-5" />
+                    </a>
                 </li>
             ))}
         </ul>
-    )
-
+    );
     return (
         <div className="relative min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-black via-purple-900/30 to-black">
-            <div className="container mx-auto px-4 ">
+            <div className="container mx-auto px-4">
                 <div className="text-center mb-16">
                     <h1 className="text-4xl md:text-6xl font-bold text-white mt-10 mb-6">
                         <span className="text-purple-400">File Tunnel</span>
@@ -111,7 +144,7 @@ const FileTunnel = () => {
                 </div>
 
                 {!tunnelMode && (
-                    <div className="flex flex-col md:flex-row  justify-center gap-2 md:space-x-4 mb-[10rem]">
+                    <div className="flex flex-col md:flex-row justify-center gap-2 md:space-x-4 mb-[10rem]">
                         <button
                             onClick={handleCreateTunnel}
                             className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors"
@@ -128,14 +161,13 @@ const FileTunnel = () => {
                 )}
 
                 <div className="w-full flex justify-center items-center mb-16">
-
                     {tunnelMode &&
                         <div
                             ref={dropzoneRef}
                             className="relative max-w-4xl w-full h-[25rem] rounded-lg border-2 border-dashed border-gray-400 transition-colors hover:border-purple-400 overflow-hidden"
                         >
                             {tunnelMode === 'create' && (
-                                <div className="absolute  z-20 top-4 left-4 right-4 flex justify-between items-center">
+                                <div className="absolute z-20 top-4 left-4 right-4 flex justify-between items-center">
                                     <div className="flex items-center space-x-2 bg-purple-500/20 px-4 py-2 rounded-2xl backdrop-blur-sm">
                                         <Link2 className="w-5 h-5 text-purple-400" />
                                         <p className="text-purple-400">Tunnel Code: {tunnelCode}</p>
@@ -241,7 +273,11 @@ const FileTunnel = () => {
                                         ) : (
                                             <div className="text-center text-gray-300 z-10">
                                                 <Upload className="w-16 h-16 mx-auto mb-4 text-purple-400" />
-                                                <p className="text-lg mb-2">Drop your files here, or click to select</p>
+                                                <p className="text-lg mb-2">
+                                                    {connectedUsers > 1
+                                                        ? "Drop your files here, or click to select"
+                                                        : "Waiting for other users to join..."}
+                                                </p>
                                                 <p className="text-sm text-gray-400">Maximum file size: 100MB</p>
                                             </div>
                                         )}
@@ -249,7 +285,6 @@ const FileTunnel = () => {
                                 </div>
                             )}
                         </div>
-
                     }
                 </div>
 
@@ -262,6 +297,7 @@ const FileTunnel = () => {
                         <div className="bg-purple-900/10 p-6 rounded-lg backdrop-blur-sm">
                             <h3 className="text-xl font-semibold text-white mb-4">Received Files</h3>
                             {renderFileList(receivedFiles)}
+                           
                         </div>
                     </div>
                 )}
@@ -274,6 +310,12 @@ const FileTunnel = () => {
                         >
                             Close Tunnel
                         </button>
+                    </div>
+                )}
+
+                {(tunnelMode === 'create' || (tunnelMode === 'join' && isJoined)) && (
+                    <div className="text-center mt-4">
+                        <p className="text-gray-300">Connected Users: {connectedUsers}</p>
                     </div>
                 )}
             </div>
