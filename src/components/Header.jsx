@@ -77,7 +77,6 @@ export default function Navbar() {
           >
             Github
           </a>
-
           <a
             href="https://robinsonhonour.me"
             className="block text-gray-300 hover:text-white py-3 border-b border-gray-200/20"
