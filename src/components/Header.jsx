@@ -12,15 +12,12 @@ export default function Navbar() {
 
       {/* Desktop Menu */}
       <div className="hidden md:flex items-center space-x-8">
-        <Link
-          to={"/"}
-          className="text-gray-300 hover:text-white"
-        >
+        <Link to={"/"} className="text-gray-300 hover:text-white">
           Home
         </Link>
-        
+
         <a
-          href="https://github.com/ikwerre-dev"
+          href="https://github.com/ikwerre-dev/clanshare"
           className="text-gray-300 hover:text-white"
         >
           Github
@@ -74,7 +71,7 @@ export default function Navbar() {
             Home
           </Link>
           <a
-            href="#pricing"
+            href="https://github.com/ikwerre-dev/clanshare"
             className="block text-gray-300 hover:text-white py-3 border-b border-gray-200/20"
             onClick={() => setIsMobileMenuOpen(false)}
           >
@@ -82,7 +79,7 @@ export default function Navbar() {
           </a>
 
           <a
-            href="#love"
+            href="https://robinsonhonour.me"
             className="block text-gray-300 hover:text-white py-3 border-b border-gray-200/20"
             onClick={() => setIsMobileMenuOpen(false)}
           >
