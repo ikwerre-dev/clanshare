@@ -20,9 +20,10 @@ import Lenis from "@studio-freight/lenis";
 import { MessageSquare, Lock, Settings } from "lucide-react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import Swal from 'sweetalert2';
 
 export default function HeroSection() {
-  const apiUrl = "http://localhost/clanshare_api";
+  const apiUrl = "http://192.168.1.115/clanshare_api";
   const currentURL = window.location.href.replace(/\/$/, "");
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
@@ -36,7 +37,7 @@ export default function HeroSection() {
     downloads: 0,
   });
   const [statsAPi, setStatsAPi] = useState(null);
-  
+
   useEffect(() => {
     const interval = setInterval(() => {
       if (statsAPi) {
@@ -51,15 +52,16 @@ export default function HeroSection() {
               : statsAPi.total_views,
           downloads:
             prev.downloads < statsAPi.total_downloads
-              ? prev.downloads + Math.ceil((statsAPi.total_downloads - prev.downloads) / 10)
+              ? prev.downloads +
+                Math.ceil((statsAPi.total_downloads - prev.downloads) / 10)
               : statsAPi.total_downloads,
         }));
       }
     }, 50);
-  
+
     return () => clearInterval(interval);
   }, [statsAPi]);
-  
+
   useEffect(() => {
     const fetchStats = () => {
       axios
@@ -76,16 +78,16 @@ export default function HeroSection() {
           console.error("Error fetching stats:", error);
         });
     };
-  
+
     fetchStats(); // Initial fetch on mount.
-  
+
     const interval = setInterval(() => {
       fetchStats();
     }, 5000); // Fetch stats every 5 seconds.
-  
+
     return () => clearInterval(interval);
   }, []);
-  
+
   useEffect(() => {
     const fetchStats = () => {
       axios
@@ -102,18 +104,16 @@ export default function HeroSection() {
           console.error("Error fetching stats:", error);
         });
     };
-  
+
     fetchStats(); // Initial fetch on mount.
-  
+
     const interval = setInterval(() => {
       fetchStats();
     }, 5000); // Fetch stats every 5 seconds.
-  
+
     return () => clearInterval(interval);
   }, []);
-  
-  
-  
+
   useEffect(() => {
     const lenis = new Lenis();
 
@@ -128,6 +128,19 @@ export default function HeroSection() {
   const onDrop = useCallback((acceptedFiles) => {
     if (acceptedFiles.length === 1) {
       const file = acceptedFiles[0];
+
+      // Check if the file size exceeds 300MB
+      const maxSizeInBytes = 300 * 1024 * 1024; // 300MB
+      if (file.size > maxSizeInBytes) {
+        Swal.fire({
+          icon: "error",
+          title: "File Too Large",
+          text: "The file exceeds the maximum size of 300MB.",
+          confirmButtonText: "Ok",
+        });
+        return; // Prevent the upload if the file is too large
+      }
+
       setIsUploading(true);
       setShareLink(null);
 
@@ -157,13 +170,16 @@ export default function HeroSection() {
           console.error("Error uploading file:", error);
           setIsUploading(false);
           setUploadProgress(0);
-          // setIsClickable(true);
-
           // Handle error (e.g., show an error message to the user)
+          Swal.fire({
+            icon: "error",
+            title: "Upload Failed",
+            text: "There was an error uploading the file. Please try again.",
+            confirmButtonText: "Ok",
+          });
         });
     }
   }, []);
-
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     maxFiles: 1,
@@ -195,7 +211,7 @@ export default function HeroSection() {
           <p className="text-xl md:text-2xl text-gray-300 mb-8">
             Upload your file and get a shareable link in seconds.
           </p>
-          <div className="flex flex-row justify-center items-center gap-5">
+          {/* <div className="flex flex-row justify-center items-center gap-5">
             <p className="text-white">or</p>
             <Link
               to={"/tunnel"}
@@ -203,7 +219,7 @@ export default function HeroSection() {
             >
               Use Tunnel
             </Link>
-          </div>
+          </div> */}
         </div>
 
         <div className="w-full flex justify-center items-center mb-16">
@@ -312,7 +328,7 @@ export default function HeroSection() {
                     Drop your file here, or click to select
                   </p>
                   <p className="text-sm text-gray-400">
-                    Maximum file size: 100MB
+                    Maximum file size: 300MB
                   </p>
                 </div>
               )}
@@ -362,97 +378,97 @@ export default function HeroSection() {
             <div className="text-gray-400">Total Downloads</div>
           </motion.div>
         </div>
-        
+
         <div className="w-full  text-white py-16">
-                  <div className="max-w-7xl mx-auto px-4">
-                    <div className="text-center mb-16">
-                      <h2 className="text-4xl font-bold mb-2">
-                        <span className="text-purple-500">Privacy</span> Built-in
-                      </h2>
-                    </div>
-        
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
-                      {/* Opt-in Feature */}
-                      <div className="flex gap-6">
-                        <MessageSquare className="w-6 h-6 text-purple-500 flex-shrink-0" />
-                        <div>
-                          <h3 className="font-semibold text-xl mb-2">
-                            Opt-in to Superhuman AI
-                          </h3>
-                          <p className="text-gray-400">
-                            You decide whether you want to use Superhuman AI. You can
-                            opt-out at any time.
-                          </p>
-                        </div>
-                      </div>
-        
-                      {/* No Third-Party Storage */}
-                      <div className="flex gap-6">
-                        <Lock className="w-6 h-6 text-purple-500 flex-shrink-0" />
-                        <div>
-                          <h3 className="font-semibold text-xl mb-2">
-                            No Third-Party Data Storage
-                          </h3>
-                          <p className="text-gray-400">
-                            We have a Zero Day Data Retention agreement, so your data
-                            will not be saved or retained by OpenAI.
-                          </p>
-                        </div>
-                      </div>
-        
-                      {/* Minimal Data Logs */}
-                      <div className="flex gap-6">
-                        <Settings className="w-6 h-6 text-purple-500 flex-shrink-0" />
-                        <div>
-                          <h3 className="font-semibold text-xl mb-2">
-                            Minimal Data Logs
-                          </h3>
-                          <p className="text-gray-400">
-                            We log custom instructions sent to OpenAI, which do not
-                            include any email data. We do not log any AI responses.
-                          </p>
-                        </div>
-                      </div>
-        
-                      {/* Data Protection */}
-                      <div className="flex gap-6">
-                        <Shield className="w-6 h-6 text-purple-500 flex-shrink-0" />
-                        <div>
-                          <h3 className="font-semibold text-xl mb-2">
-                            Data Protection Policies
-                          </h3>
-                          <p className="text-gray-400">
-                            We have not and will not opt-in to sharing your data with
-                            OpenAI so they can train their models.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-        
-                    <div className="pt-5">
-                      <h2 className="text-3xl font-bold text-center mb-12">
-                        Quick Note from the Creator...
-                      </h2>
-                      <div className="grid grid-cols-1 gap-6">
-                        <div className="bg-purple-900/10 rounded-lg p-6">
-                          <p className="text-gray-300 mb-4">
-                            Been able to Build a secure sharing tunnel for you to share
-                            files and Apps within yourself, This Project is open source,
-                            Feel Free to Star, Fork this repo... Happy Coding :)
-                          </p>
-                          <div className="flex items-center gap-3">
-                            <div>
-                              <p className="font-semibold">Robinson Honour</p>
-                              <p className="text-gray-400 text-sm">
-                                FullStack Developer
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold mb-2">
+                <span className="text-purple-500">Privacy</span> Built-in
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
+              {/* Opt-in Feature */}
+              <div className="flex gap-6">
+                <MessageSquare className="w-6 h-6 text-purple-500 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-xl mb-2">
+                    Opt-in to Superhuman AI
+                  </h3>
+                  <p className="text-gray-400">
+                    You decide whether you want to use Superhuman AI. You can
+                    opt-out at any time.
+                  </p>
+                </div>
+              </div>
+
+              {/* No Third-Party Storage */}
+              <div className="flex gap-6">
+                <Lock className="w-6 h-6 text-purple-500 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-xl mb-2">
+                    No Third-Party Data Storage
+                  </h3>
+                  <p className="text-gray-400">
+                    We have a Zero Day Data Retention agreement, so your data
+                    will not be saved or retained by OpenAI.
+                  </p>
+                </div>
+              </div>
+
+              {/* Minimal Data Logs */}
+              <div className="flex gap-6">
+                <Settings className="w-6 h-6 text-purple-500 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-xl mb-2">
+                    Minimal Data Logs
+                  </h3>
+                  <p className="text-gray-400">
+                    We log custom instructions sent to OpenAI, which do not
+                    include any email data. We do not log any AI responses.
+                  </p>
+                </div>
+              </div>
+
+              {/* Data Protection */}
+              <div className="flex gap-6">
+                <Shield className="w-6 h-6 text-purple-500 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-xl mb-2">
+                    Data Protection Policies
+                  </h3>
+                  <p className="text-gray-400">
+                    We have not and will not opt-in to sharing your data with
+                    OpenAI so they can train their models.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-5">
+              <h2 className="text-3xl font-bold text-center mb-12">
+                Quick Note from the Creator...
+              </h2>
+              <div className="grid grid-cols-1 gap-6">
+                <div className="bg-purple-900/10 rounded-lg p-6">
+                  <p className="text-gray-300 mb-4">
+                    Been able to Build a secure sharing tunnel for you to share
+                    files and Apps within yourself, This Project is open source,
+                    Feel Free to Star, Fork this repo... Happy Coding :)
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <div>
+                      <p className="font-semibold">Robinson Honour</p>
+                      <p className="text-gray-400 text-sm">
+                        FullStack Developer
+                      </p>
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <div className="text-center mb-5">
           <h2 className="text-4xl text-white font-bold mb-2">
             <span className="text-purple-500">Key</span> Features
@@ -496,7 +512,6 @@ export default function HeroSection() {
             </p>
           </motion.div>
         </div>
-
       </div>
     </div>
   );

@@ -141,9 +141,13 @@ const FileTunnel = () => {
                     <p className="text-xl md:text-2xl text-gray-300 mb-8">
                         Create a secure tunnel to share files instantly.
                     </p>
+                    
+                    <p className="text-xl md:text-2xl text-gray-300 mb-8">
+                      Coming soon...
+                    </p>
                 </div>
 
-                {!tunnelMode && (
+                {/* {!tunnelMode && (
                     <div className="flex flex-col md:flex-row justify-center gap-2 md:space-x-4 mb-[10rem]">
                         <button
                             onClick={handleCreateTunnel}
@@ -158,7 +162,7 @@ const FileTunnel = () => {
                             Join Tunnel
                         </button>
                     </div>
-                )}
+                )} */}
 
                 <div className="w-full flex justify-center items-center mb-16">
                     {tunnelMode &&
