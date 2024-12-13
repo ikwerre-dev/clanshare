@@ -10,7 +10,6 @@ function Tunnel() {
     <div className='bg-[#000] min-h-screen'>
       <Header />
       <TunnelSection />
-      
       <Footer />
     </div>
   )

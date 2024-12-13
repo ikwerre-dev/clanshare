@@ -74,11 +74,11 @@ export default function HeroSection() {
         });
     };
 
-    fetchStats(); // Initial fetch on mount.
+    fetchStats(); 
 
     const interval = setInterval(() => {
       fetchStats();
-    }, 5000); // Fetch stats every 5 seconds.
+    }, 5000);  
 
     return () => clearInterval(interval);
   }, []);
@@ -100,11 +100,11 @@ export default function HeroSection() {
         });
     };
 
-    fetchStats(); // Initial fetch on mount.
+    fetchStats(); 
 
     const interval = setInterval(() => {
       fetchStats();
-    }, 5000); // Fetch stats every 5 seconds.
+    }, 5000);  
 
     return () => clearInterval(interval);
   }, []);
@@ -124,7 +124,6 @@ export default function HeroSection() {
     if (acceptedFiles.length === 1) {
       const file = acceptedFiles[0];
 
-      // Check if the file size exceeds 300MB
       const maxSizeInBytes = 300 * 1024 * 1024; // 300MB
       if (file.size > maxSizeInBytes) {
         Swal.fire({
@@ -159,13 +158,12 @@ export default function HeroSection() {
           setIsUploading(false);
           setIsClickable(false);
           setUploadProgress(0);
-          setShareLink(currentURL + "/d/" + response.data.access_code); // Assuming the API returns a shareLink
+          setShareLink(currentURL + "/d/" + response.data.access_code); 
         })
         .catch((error) => {
           console.error("Error uploading file:", error);
           setIsUploading(false);
           setUploadProgress(0);
-          // Handle error (e.g., show an error message to the user)
           Swal.fire({
             icon: "error",
             title: "Upload Failed",
@@ -183,12 +181,13 @@ export default function HeroSection() {
 
   const handleCopyLink = (e) => {
     e.preventDefault();
-    navigator.clipboard.writeText(shareLink); // Uncomment this to copy the link
+    navigator.clipboard.writeText(shareLink);  
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);
   };
 
   const handleRestart = (e) => {
+    e.preventDefault();
     setIsClickable(true);
     setIsUploading(false);
     setShareLink(null);
