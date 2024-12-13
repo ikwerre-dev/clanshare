@@ -10,7 +10,6 @@ export default function Navbar() {
         <Link to={"/"}>CLAN SHARE</Link>
       </div>
 
-      {/* Desktop Menu */}
       <div className="hidden md:flex items-center space-x-8">
         <Link to={"/"} className="text-gray-300 hover:text-white">
           Home
@@ -36,7 +35,6 @@ export default function Navbar() {
         </Link>
       </div>
 
-      {/* Mobile Menu Button */}
       <button
         className="md:hidden text-white focus:outline-none"
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}

@@ -56,7 +56,7 @@ export default function HeroSection() {
   
     return () => clearInterval(interval);
   }, [statsAPi]);
-
+ 
   useEffect(() => {
     const fetchStats = () => {
       axios
