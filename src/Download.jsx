@@ -10,7 +10,9 @@ import fileDownload from "js-file-download";
 const FileTunnel = () => {
   const { access } = useParams(); // Extracting the :access parameter
   const [fileData, setFileData] = useState(null);
+  const [isDownloading, setIsDownloading] = useState(false); // Add state for downloading
   const apiUrl = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     const fetchFileData = async () => {
       try {
@@ -28,19 +30,19 @@ const FileTunnel = () => {
 
   const handleDownload = async (mylink) => {
     try {
+      setIsDownloading(true); // Set loading state to true
+
+      // Update the download count
       await axios.post(`${apiUrl}/addDownloadCount`, {
         file_id: access,
       });
 
-      // saveAs(`${apiUrl}${mylink}`);
-      console.log(mylink)
-      
-
+      // Start the download process
       downloadFile(apiUrl + mylink, access);
     } catch (error) {
       console.error(
         "Error updating download count or triggering download:",
-        error,
+        error
       );
     }
   };
@@ -52,7 +54,9 @@ const FileTunnel = () => {
     link.href = window.URL.createObjectURL(blob);
     link.download = filename; // This forces the browser to download the file
     link.click();
+    setIsDownloading(false); // Set loading state back to false once download is complete
   };
+
   const formatFileSize = (sizeInBytes) => {
     return (sizeInBytes / (1024 * 1024)).toFixed(2) + " MB"; // Convert bytes to MB with two decimal places
   };
@@ -64,6 +68,7 @@ const FileTunnel = () => {
       </div>
     );
   }
+
   if (fileData.error) {
     return (
       <div className="bg-[#000] min-h-screen flex items-center justify-center text-white">
@@ -145,8 +150,9 @@ const FileTunnel = () => {
                 <button
                   onClick={() => handleDownload(fileData.link)}
                   className="block bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg mt-4"
+                  disabled={isDownloading} // Disable the button while downloading
                 >
-                  Download
+                  {isDownloading ? "Processing..." : "Download"} {/* Change text based on state */}
                 </button>
               </div>
             </div>

@@ -43,17 +43,13 @@ export default function HeroSection() {
       if (statsAPi) {
         setStats((prev) => ({
           links:
-            prev.links < (statsAPi.total_files ?? 0)
-              ? prev.links + Math.ceil(((statsAPi.total_files ?? 0) - prev.links) / 10)
-              : (statsAPi.total_files ?? 0),
+            (statsAPi.total_files ?? 0),
           users:
-            prev.users < (statsAPi.total_views ?? 0)
-              ? prev.users + Math.ceil(((statsAPi.total_views ?? 0) - prev.users) / 10)
-              : (statsAPi.total_views ?? 0),
+            (statsAPi.total_views ?? 0)
+             ,
           downloads:
-            prev.downloads < (statsAPi.total_downloads ?? 0)
-              ? prev.downloads + Math.ceil(((statsAPi.total_downloads ?? 0) - prev.downloads) / 10)
-              : (statsAPi.total_downloads ?? 0),
+           (statsAPi.total_downloads ?? 0)
+            ,
         }));
       }
     }, 50);
